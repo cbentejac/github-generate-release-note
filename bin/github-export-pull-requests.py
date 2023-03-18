@@ -8,6 +8,7 @@ import json
 
 def setup_arg_parser():
     """ Initialize the argument parser and set the list of arguments. """
+
     arg_parser = argparse.ArgumentParser(
         description="""Tool to export the full list of pull requests associated
                        to a milestone for a specified GitHub repository as a
