@@ -10,11 +10,12 @@ def setup_arg_parser():
     arg_parser = argparse.ArgumentParser(
         description="""Tool to format a JSON file obtained through the GitHub
                        API and containing the list of pull requests associated
-                       to a milestone into a markdown release note. Pull requests
-                       that were closed but not merged will be automatically ignored.
-                       The list of contributors can be generated in a separate files, 
-                       and some labels may be excluded from the final release note to
-                       be written in separate files.""")
+                       to a milestone into a markdown release note. Pull
+                       requests that were closed but not merged will be
+                       automatically ignored. The list of contributors can be
+                       generated in a separate files, and some labels may be
+                       excluded from the final release note to be written in
+                       separate files.""")
     arg_parser.add_argument(
         "-i", "--input",
         default="githublist.json",
@@ -34,23 +35,25 @@ def setup_arg_parser():
         "--label-exclude",
         dest="exclude",
         nargs="+",
-        help="""labels that will be excluded from the release note and 
-                dumped in a dedicated file instead; several labels can be 
-                provided at once, either concatenated like "--label-exclude label1,label2" 
-                to dump them in the same file, or separated like "--label-exclude label1 label2" 
-                to dump them in separate files. a pull request do not need to have all the labels
-                from a concatenated input to be excluded, one is enough.""")
+        help="""labels that will be excluded from the release note and
+                dumped in a dedicated file instead; several labels can be
+                provided at once, either concatenated like 
+                "--label-exclude label1,label2" to dump them in the same file, 
+                or separated like "--label-exclude label1 label2" to dump 
+                them in separate files. a pull request do not need to have all 
+                the labels from a concatenated input to be excluded, one is 
+                enough.""")
     arg_parser.add_argument(
         "--label-include",
         dest="include",
         nargs="+",
         help="""labels that will be included in the release note but in a
-                subsection; several labels can be provided at once, either 
-                concatenated like "--label-include label1,label2" to place 
-                them in the same subsection, or separated like 
+                subsection; several labels can be provided at once, either
+                concatenated like "--label-include label1,label2" to place
+                them in the same subsection, or separated like
                 "--label-include label1 label2" to place them in different
-                subsections. a pull request do not need to have all the labels 
-                from a concatenated input to be separated from the main 
+                subsections. a pull request do not need to have all the labels
+                from a concatenated input to be separated from the main
                 release note, one is enough.""")
 
     return arg_parser
@@ -117,7 +120,7 @@ def write_excluded_prs_note(excluded_pull_requests, milestone_title,
 def write_final_release_note(pull_requests, milestone_title,
                              included_pull_requests, show_pr_nb):
     """ Write the final release note containing all the pull requests that were
-        correctly merged and not excluded because of their labels. Labels that 
+        correctly merged and not excluded because of their labels. Labels that
         are included will be written in a different subsection. """
 
     with open("{}-release-note.md".format(milestone_title),
@@ -235,7 +238,8 @@ def main():
     if included_counters:
         print("\tAmong which:")
         for label, counter in included_counters.items():
-            print("\t- {} pull requests with the label(s) '{}'".format(counter, label))
+            print("\t- {} pull requests with the label(s) '{}'"
+                  .format(counter, label))
     print("Total number of unique contributors: {}".format(len(authors)))
     print("Total number of unmerged pull requests that were ignored: {}"
           .format(unmerged_counter))
