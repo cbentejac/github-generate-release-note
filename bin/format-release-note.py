@@ -40,26 +40,38 @@ def setup_arg_parser():
                 to dump them in the same file, or separated like "--label-exclude label1 label2" 
                 to dump them in separate files. a pull request do not need to have all the labels
                 from a concatenated input to be excluded, one is enough.""")
+    arg_parser.add_argument(
+        "--label-include",
+        dest="include",
+        nargs="+",
+        help="""labels that will be included in the release note but in a
+                subsection; several labels can be provided at once, either 
+                concatenated like "--label-include label1,label2" to place 
+                them in the same subsection, or separated like 
+                "--label-include label1 label2" to place them in different
+                subsections. a pull request do not need to have all the labels 
+                from a concatenated input to be separated from the main 
+                release note, one is enough.""")
 
     return arg_parser
 
 
-def setup_excluded_labels(labels_to_exclude):
-    """ Parse the provided labels to exclude, and distinguish cases where
-        several labels need to be excluded separately or where they need
-        to be excluded together."""
+def setup_labels_of_interest(labels_of_interest):
+    """ Parse the provided labels to include/exclude, and distinguish cases
+        where several labels need to be included/excluded separately or where
+        they need to be included/excluded together. """
 
-    excluded_labels = {}
+    relevant_labels = {}
 
-    if labels_to_exclude:
-        for label in labels_to_exclude:
+    if labels_of_interest:
+        for label in labels_of_interest:
             if "," in label:  # Identify concatenated labels, treat them as one
                 concatenated_labels = label.split(",")
-                excluded_labels[label] = concatenated_labels
+                relevant_labels[label] = concatenated_labels
             else:
-                excluded_labels[label] = label
+                relevant_labels[label] = label
 
-    return excluded_labels
+    return relevant_labels
 
 
 def get_pr_labels(data):
@@ -102,9 +114,11 @@ def write_excluded_prs_note(excluded_pull_requests, milestone_title,
                     format(title, " " + number if show_pr_nb else "", link))
 
 
-def write_final_release_note(pull_requests, milestone_title, show_pr_nb):
+def write_final_release_note(pull_requests, milestone_title,
+                             included_pull_requests, show_pr_nb):
     """ Write the final release note containing all the pull requests that were
-        correctly merged and not excluded because of their labels. """
+        correctly merged and not excluded because of their labels. Labels that 
+        are included will be written in a different subsection. """
 
     with open("{}-release-note.md".format(milestone_title),
               "w", encoding="utf8") as release_note:
@@ -115,6 +129,13 @@ def write_final_release_note(pull_requests, milestone_title, show_pr_nb):
                                .format(title,
                                        " " + number if show_pr_nb else "",
                                        link))
+        for included_labels, labeled_prs in included_pull_requests.items():
+            release_note.write("\n### {}\n\n".format(included_labels))
+            for (title, link, number) in labeled_prs:
+                release_note.write("- {} [PR{}]({})\n"
+                                   .format(title,
+                                           " " + number if show_pr_nb else "",
+                                           link))
 
 
 def main():
@@ -139,7 +160,7 @@ def main():
 
     # Dictionary containing the excluded labels with a distinction
     # between concatenated labels and stand-alone ones
-    excluded_labels = setup_excluded_labels(args.exclude)
+    excluded_labels = setup_labels_of_interest(args.exclude)
 
     # Initialize the dictionary of excluded pull requests based on their labels
     excluded_pull_requests = {}
@@ -147,6 +168,15 @@ def main():
     for label in excluded_labels.keys():
         excluded_pull_requests[label] = []
         excluded_counters[label] = 0
+
+    # Same thing for the included labels
+    included_labels = setup_labels_of_interest(args.include)
+
+    included_pull_requests = {}
+    included_counters = {}
+    for label in included_labels.keys():
+        included_pull_requests[label] = []
+        included_counters[label] = 0
 
     # Counters to print a summary at the end of the script
     total_counter = 0  # Pull requests in the input file
@@ -179,7 +209,19 @@ def main():
                         excluded_counters[excluded_label] + 1
                     exclude_pr = True
 
-        if exclude_pr:
+        include_pr = False
+        for label in labels:
+            for included_label in included_labels.keys():
+                if label in included_label:
+                    included_pull_requests[included_label].append(
+                        (pr["title"], pr["html_url"],
+                            "#{}".format(pr["number"])))
+                    included_counters[included_label] = \
+                        included_counters[included_label] + 1
+                    regular_counter = regular_counter + 1
+                    include_pr = True
+
+        if exclude_pr or include_pr:
             continue
 
         pull_requests.append(
@@ -190,16 +232,21 @@ def main():
     print("Total number of pull requests parsed: {}".format(total_counter))
     print("Total number of pull requests added to the release note: {}"
           .format(regular_counter))
+    if included_counters:
+        print("\tAmong which:")
+        for label, counter in included_counters.items():
+            print("\t- {} pull requests with the label(s) '{}'".format(counter, label))
     print("Total number of unique contributors: {}".format(len(authors)))
     print("Total number of unmerged pull requests that were ignored: {}"
           .format(unmerged_counter))
     print("Total number of excluded pull requests with the label(s):")
     for label, counter in excluded_counters.items():
-        print("\t- {}: {}".format(label, counter))
+        print("\t- '{}': {}".format(label, counter))
 
     if args.authors:
         write_authors(authors, milestone_title)
-    write_final_release_note(pull_requests, milestone_title, args.pr_nb)
+    write_final_release_note(
+        pull_requests, milestone_title, included_pull_requests, args.pr_nb)
     if args.exclude:
         write_excluded_prs_note(excluded_pull_requests,
                                 milestone_title, args.pr_nb)
