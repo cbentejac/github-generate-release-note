@@ -42,7 +42,8 @@ def setup_arg_parser():
                 or separated like "--label-exclude label1 label2" to dump
                 them in separate files. a pull request does not need to have 
                 all the labels from a concatenated input to be excluded, one is
-                enough. labels are case-sensitive.""")
+                enough. labels are case-sensitive. label exclusion takes
+                precedence over word exclusion.""")
     arg_parser.add_argument(
         "--label-include",
         dest="include",
@@ -54,7 +55,35 @@ def setup_arg_parser():
                 "--label-include label1 label2" to place them in different
                 subsections. a pull request does not need to have all the 
                 labels from a concatenated input to be separated from the main
-                release note, one is enough. labels are case-sensitive.""")
+                release note, one is enough. labels are case-sensitive.
+                label inclusion takes precedence over word inclusion.""")
+    arg_parser.add_argument(
+        "--word-exclude",
+        dest="word_exclude",
+        nargs="+",
+        help="""words in the title of the pull requests that will be excluded 
+                from the release note and dumped in a dedicated file instead;
+                several words can be provided at once, either concatenated like
+                "--word-exclude word1,word2" to dump them in the same file, or
+                separated like "--word-exclude word1,word2" to dump them in
+                separate files. a pull request does not need to have all the
+                words from a concatenated input in its title to be excluded, 
+                one is enough. words are case-insensitive. word exclusion
+                is not prioritary over label exclusion.""")
+    arg_parser.add_argument(
+        "--word-include",
+        dest="word_include",
+        nargs="+",
+        help="""words in the title of the pulls requests that will be included 
+                in the release note but in a subsection; several words can be 
+                provided at once, either concatenated like 
+                "--word-include word1,word2" to place them in the same 
+                subsection, or separated like "--word-include label1 label2" 
+                to place them in different subsections. a pull request does 
+                not need to have all the words from a concatenated input in its
+                title to be separated from the main release note, one is 
+                enough. words are case-insensitive. word inclusion is not 
+                prioritary over label inclusion.""")
 
     return arg_parser
 
@@ -75,6 +104,26 @@ def setup_labels_of_interest(labels_of_interest):
                 relevant_labels[label] = label
 
     return relevant_labels
+
+
+def setup_words_of_interest(words_of_interest):
+    """ Parse the provided words to include/exclude, and distinguish cases
+        where several words need to be included/excluded together separately
+        or where they need to included/excluded together. Words are lowered
+        as the search is case-insensitive. """
+
+    # TODO: use a single function to setup labels and words to include/exclude
+    relevant_words = {}
+
+    if words_of_interest:
+        for word in words_of_interest:
+            if "," in word:  # Identify concatenated words, treat them as one
+                concatenated_words = word.lower().split(",")
+                relevant_words[word.lower()] = concatenated_words
+            else:
+                relevant_words[word.lower()] = word.lower()
+
+    return relevant_words
 
 
 def get_pr_labels(data):
@@ -98,8 +147,9 @@ def write_authors(authors, milestone_title):
             authors_file.write("- {}\n".format(author))
 
 
-def write_excluded_prs_note(excluded_pull_requests, milestone_title,
-                            show_pr_nb):
+def write_excluded_prs_note(excluded_pull_requests,
+                            excluded_word_pull_requests,
+                            milestone_title, show_pr_nb):
     """ Write the files containing the excluded labels.
         Concatenated labels will be written in the same file together. """
 
@@ -116,9 +166,22 @@ def write_excluded_prs_note(excluded_pull_requests, milestone_title,
                     "- {} [PR{}]({})\n".
                     format(title, " " + number if show_pr_nb else "", link))
 
+    for excluded_words, prs in excluded_word_pull_requests.items():
+        filename = excluded_words.replace(
+            ":", "").replace("/", "").replace("?", "")
+
+        with open("{}-{}.md".format(milestone_title, filename),
+                  "w", encoding="utf8") as excluded_prs_file:
+            excluded_prs_file.write("### {}\n\n".format(excluded_words))
+            for (title, link, number) in prs:
+                excluded_prs_file.write(
+                    "- {} [PR{}]({})\n".
+                    format(title, " " + number if show_pr_nb else "", link))
+
 
 def write_final_release_note(pull_requests, milestone_title,
-                             included_pull_requests, show_pr_nb):
+                             included_pull_requests,
+                             included_word_pull_requests, show_pr_nb):
     """ Write the final release note containing all the pull requests that were
         correctly merged and not excluded because of their labels. Labels that
         are included will be written in a different subsection. """
@@ -135,6 +198,13 @@ def write_final_release_note(pull_requests, milestone_title,
         for included_labels, labeled_prs in included_pull_requests.items():
             release_note.write("\n### {}\n\n".format(included_labels))
             for (title, link, number) in labeled_prs:
+                release_note.write("- {} [PR{}]({})\n"
+                                   .format(title,
+                                           " " + number if show_pr_nb else "",
+                                           link))
+        for included_words, prs in included_word_pull_requests.items():
+            release_note.write("\n### {}\n\n".format(included_words))
+            for (title, link, number) in prs:
                 release_note.write("- {} [PR{}]({})\n"
                                    .format(title,
                                            " " + number if show_pr_nb else "",
@@ -161,6 +231,8 @@ def main():
     authors = set()  # Contains the username of contributors
     pull_requests = []  # Contains tuples (title, link, number)
 
+    # TODO: refactorize the whole setup of the included/excluded labels & words
+
     # Dictionary containing the excluded labels with a distinction
     # between concatenated labels and stand-alone ones
     excluded_labels = setup_labels_of_interest(args.exclude)
@@ -180,6 +252,26 @@ def main():
     for label in included_labels.keys():
         included_pull_requests[label] = []
         included_counters[label] = 0
+
+    # Dictionary containing the excluded words with a distinction
+    # between concatenated labels and stand-alone ones
+    excluded_words = setup_words_of_interest(args.word_exclude)
+
+    # Initialize the dictionary of excluded pull requests based on their labels
+    excluded_word_pull_requests = {}
+    excluded_word_counters = {}
+    for word in excluded_words.keys():
+        excluded_word_pull_requests[word] = []
+        excluded_word_counters[word] = 0
+
+    # Same thing for the included words
+    included_words = setup_words_of_interest(args.word_include)
+
+    included_word_pull_requests = {}
+    included_word_counters = {}
+    for word in included_words.keys():
+        included_word_pull_requests[word] = []
+        included_word_counters[word] = 0
 
     # Counters to print a summary at the end of the script
     total_counter = 0  # Pull requests in the input file
@@ -201,6 +293,7 @@ def main():
         # Get the labels from the pull request
         labels = get_pr_labels(pr)
 
+        # TODO: use a function here instead of duplicating code
         exclude_pr = False
         for label in labels:
             for excluded_label in excluded_labels.keys():
@@ -211,8 +304,9 @@ def main():
                     excluded_counters[excluded_label] = \
                         excluded_counters[excluded_label] + 1
                     exclude_pr = True
+                    break
 
-        include_pr = False
+        include_pr = False  # True if the PR is included in subsections
         for label in labels:
             for included_label in included_labels.keys():
                 if label in included_label:
@@ -223,6 +317,61 @@ def main():
                         included_counters[included_label] + 1
                     regular_counter = regular_counter + 1
                     include_pr = True
+                    break
+
+        if exclude_pr or include_pr:
+            continue
+
+        # Reset exclusion / inclusion booleans to check for words
+        exclude_pr = False
+        include_pr = False
+        lowered_title = pr["title"].lower()
+
+        # TODO: heavy refactoring
+        for excluded_key in excluded_words.keys():
+            if (isinstance(excluded_words[excluded_key], str)):
+                if excluded_words[excluded_key] in lowered_title:
+                    excluded_word_pull_requests[excluded_key].append(
+                        (pr["title"], pr["html_url"],
+                            "#{}".format(pr["number"])))
+                    excluded_word_counters[excluded_key] = \
+                        excluded_word_counters[excluded_key] + 1
+                    exclude_pr = True
+                    break
+            else:
+                for excluded_word in excluded_words[excluded_key]:
+                    if excluded_word in lowered_title:
+                        excluded_word_pull_requests[excluded_key].append(
+                            (pr["title"], pr["html_url"],
+                                "#{}".format(pr["number"])))
+                        excluded_word_counters[excluded_key] = \
+                            excluded_word_counters[excluded_key] + 1
+                        exclude_pr = True
+                        break
+
+        for included_key in included_words.keys():
+            if (isinstance(included_words[included_key], str)):
+                if included_words[included_key] in lowered_title:
+                    included_word_pull_requests[included_key].append(
+                        (pr["title"], pr["html_url"],
+                            "#{}".format(pr["number"])))
+                    included_word_counters[included_key] = \
+                        included_word_counters[included_key] + 1
+                    regular_counter = regular_counter + 1
+                    include_pr = True
+                    break
+
+            else:
+                for included_word in included_words[included_key]:
+                    if included_word in lowered_title:
+                        included_word_pull_requests[included_key].append(
+                            (pr["title"], pr["html_url"],
+                                "#{}".format(pr["number"])))
+                        included_word_counters[included_key] = \
+                            included_word_counters[included_key] + 1
+                        regular_counter = regular_counter + 1
+                        include_pr = True
+                        break
 
         if exclude_pr or include_pr:
             continue
@@ -240,19 +389,26 @@ def main():
         for label, counter in included_counters.items():
             print("\t- {} pull requests with the label(s) '{}'"
                   .format(counter, label))
+        for word, counter in included_word_counters.items():
+            print("\t- {} pull requests with the word(s) '{}'"
+                  .format(counter, word))
     print("Total number of unique contributors: {}".format(len(authors)))
     print("Total number of unmerged pull requests that were ignored: {}"
           .format(unmerged_counter))
     print("Total number of excluded pull requests with the label(s):")
     for label, counter in excluded_counters.items():
         print("\t- '{}': {}".format(label, counter))
+    for word, counter in excluded_word_counters.items():
+        print("\t- '{}': {}".format(word, counter))
 
     if args.authors:
         write_authors(authors, milestone_title)
-    write_final_release_note(
-        pull_requests, milestone_title, included_pull_requests, args.pr_nb)
+    write_final_release_note(pull_requests, milestone_title,
+                             included_pull_requests,
+                             included_word_pull_requests, args.pr_nb)
     if args.exclude:
         write_excluded_prs_note(excluded_pull_requests,
+                                excluded_word_pull_requests,
                                 milestone_title, args.pr_nb)
 
 
