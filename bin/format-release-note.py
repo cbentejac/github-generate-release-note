@@ -211,11 +211,9 @@ def write_final_release_note(pull_requests, milestone_title,
                                            link))
 
 
-def main():
-    arg_parser = setup_arg_parser()
-    args = arg_parser.parse_args()
-
-    with open("{}".format(args.input), "r") as json_file:
+def execute(input_file, authors, show_pr_nb, excl_labels, incl_labels,
+            excl_words, incl_words):
+    with open("{}".format(input_file), "r") as json_file:
         data = json.load(json_file)
 
     # Check that there are pull requests to parse in the input file.
@@ -223,7 +221,7 @@ def main():
     # might be different and this tests will thus fail.
     pull_requests_data = data["items"]
     if len(pull_requests_data) == 0:
-        print("No pull requests to parse in {}".format(args.input))
+        print("No pull requests to parse in {}".format(input_file))
         return
 
     milestone_title = pull_requests_data[0]["milestone"]["title"]
@@ -235,7 +233,7 @@ def main():
 
     # Dictionary containing the excluded labels with a distinction
     # between concatenated labels and stand-alone ones
-    excluded_labels = setup_labels_of_interest(args.exclude)
+    excluded_labels = setup_labels_of_interest(excl_labels)
 
     # Initialize the dictionary of excluded pull requests based on their labels
     excluded_pull_requests = {}
@@ -245,7 +243,7 @@ def main():
         excluded_counters[label] = 0
 
     # Same thing for the included labels
-    included_labels = setup_labels_of_interest(args.include)
+    included_labels = setup_labels_of_interest(incl_labels)
 
     included_pull_requests = {}
     included_counters = {}
@@ -255,7 +253,7 @@ def main():
 
     # Dictionary containing the excluded words with a distinction
     # between concatenated labels and stand-alone ones
-    excluded_words = setup_words_of_interest(args.word_exclude)
+    excluded_words = setup_words_of_interest(excl_words)
 
     # Initialize the dictionary of excluded pull requests based on their labels
     excluded_word_pull_requests = {}
@@ -265,7 +263,7 @@ def main():
         excluded_word_counters[word] = 0
 
     # Same thing for the included words
-    included_words = setup_words_of_interest(args.word_include)
+    included_words = setup_words_of_interest(incl_words)
 
     included_word_pull_requests = {}
     included_word_counters = {}
@@ -401,15 +399,23 @@ def main():
     for word, counter in excluded_word_counters.items():
         print("\t- '{}': {}".format(word, counter))
 
-    if args.authors:
+    if authors:
         write_authors(authors, milestone_title)
     write_final_release_note(pull_requests, milestone_title,
                              included_pull_requests,
-                             included_word_pull_requests, args.pr_nb)
-    if args.exclude:
+                             included_word_pull_requests, show_pr_nb)
+    if excl_labels or excl_words:
         write_excluded_prs_note(excluded_pull_requests,
                                 excluded_word_pull_requests,
-                                milestone_title, args.pr_nb)
+                                milestone_title, show_pr_nb)
+
+
+def main():
+    arg_parser = setup_arg_parser()
+    args = arg_parser.parse_args()
+
+    execute(args.input, args.authors, args.pr_nb, args.exclude,
+            args.include, args.word_exclude, args.word_include)
 
 
 if __name__ == '__main__':

@@ -107,23 +107,31 @@ def request_pull_requests(repository, milestone, sorting, token):
     return pull_requests
 
 
+def execute(repo_param, milestone_param, sorting_param, token, output):
+    try:
+        pull_requests = request_pull_requests(
+            repo_param, milestone_param, sorting_param, token)
+    except RequestException as _:
+        print("Exception while trying to access GitHub")
+        return
+
+    with open("{}".format(output), "w", encoding="utf8") as json_file:
+        json.dump(pull_requests, json_file, indent=4)
+
+
 def main():
     arg_parser = setup_arg_parser()
     args = arg_parser.parse_args()
 
     repo_param = "repo:{}/{}".format(args.owner, args.repo)
-    milestone_param = "milestone:{}".format(args.milestone)
+    if args.milestone.strip().find(' ') == -1:
+        milestone_param = "milestone:{}".format(args.milestone)
+    else:
+        milestone_param = "milestone:\"{}\"".format(args.milestone)
     sorting_param = "sort:{}".format(args.sort)
 
-    try:
-        pull_requests = request_pull_requests(
-            repo_param, milestone_param, sorting_param, args.token)
-    except RequestException as _:
-        print("Exception while trying to access GitHub")
-        return
-
-    with open("{}".format(args.output), "w", encoding="utf8") as json_file:
-        json.dump(pull_requests, json_file, indent=4)
+    execute(repo_param, milestone_param,
+            sorting_param, args.token, args.output)
 
 
 if __name__ == '__main__':
