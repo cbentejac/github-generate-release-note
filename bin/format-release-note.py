@@ -37,12 +37,12 @@ def setup_arg_parser():
         nargs="+",
         help="""labels that will be excluded from the release note and
                 dumped in a dedicated file instead; several labels can be
-                provided at once, either concatenated like 
-                "--label-exclude label1,label2" to dump them in the same file, 
-                or separated like "--label-exclude label1 label2" to dump 
-                them in separate files. a pull request do not need to have all 
-                the labels from a concatenated input to be excluded, one is 
-                enough.""")
+                provided at once, either concatenated like
+                "--label-exclude label1,label2" to dump them in the same file,
+                or separated like "--label-exclude label1 label2" to dump
+                them in separate files. a pull request does not need to have 
+                all the labels from a concatenated input to be excluded, one is
+                enough. labels are case-sensitive.""")
     arg_parser.add_argument(
         "--label-include",
         dest="include",
@@ -52,9 +52,9 @@ def setup_arg_parser():
                 concatenated like "--label-include label1,label2" to place
                 them in the same subsection, or separated like
                 "--label-include label1 label2" to place them in different
-                subsections. a pull request do not need to have all the labels
-                from a concatenated input to be separated from the main
-                release note, one is enough.""")
+                subsections. a pull request does not need to have all the 
+                labels from a concatenated input to be separated from the main
+                release note, one is enough. labels are case-sensitive.""")
 
     return arg_parser
 
