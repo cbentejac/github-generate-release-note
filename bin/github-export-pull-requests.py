@@ -44,16 +44,16 @@ def setup_arg_parser():
     arg_parser.add_argument(
         "-t", "--token",
         help="""GitHub authentication token (optional: might be needed to 
-        perform a lot of requests in a short amount of time)""")
+                perform a lot of requests in a short amount of time)""")
 
     return arg_parser
 
 
 def request_pull_requests(repository, milestone, sorting, token):
     """ Send the request to retrieve all the pull requests associated to a
-    a milestone for a given repository and catch the response. If there
-    are several pages, retrieve them all and concatenate while preserving
-    the sorting order. """
+        a milestone for a given repository and catch the response. If there
+        are several pages, retrieve them all and concatenate while preserving
+        the sorting order. """
 
     GITHUB_REQUEST_URL = "https://api.github.com/search/issues"
     TYPE_PR_REQUEST = "type:pr"
