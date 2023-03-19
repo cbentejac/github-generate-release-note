@@ -1,6 +1,10 @@
 # Demo
 
-Release note generated with a list of contributors on the side. The pull request number is directly shown, and it is not necessary to hover over the link or to click it to see which pull request is referred to.
+Release note generated with a list of contributors on the side.
+
+Cancelled pull requests like #9 are automatically ignored.
+
+The pull request number is directly shown, and it is not necessary to hover over the link or to click it to see which pull request is referred to.
 
 _Any file in this directory beside this README.md is a result of the command below._
 
