@@ -211,7 +211,7 @@ def write_final_release_note(pull_requests, milestone_title,
                                            link))
 
 
-def execute(input_file, write_authors, show_pr_nb, excl_labels, incl_labels,
+def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
             excl_words, incl_words):
     with open("{}".format(input_file), "r") as json_file:
         data = json.load(json_file)
@@ -399,7 +399,7 @@ def execute(input_file, write_authors, show_pr_nb, excl_labels, incl_labels,
     for word, counter in excluded_word_counters.items():
         print("\t- '{}': {}".format(word, counter))
 
-    if write_authors:
+    if export_authors:
         write_authors(authors, milestone_title)
     write_final_release_note(pull_requests, milestone_title,
                              included_pull_requests,
