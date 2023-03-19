@@ -9,9 +9,13 @@ def setup_arg_parser():
     """ Initialize the argument parser and set the list of arguments. """
 
     arg_parser = argparse.ArgumentParser(
-        description="""Tool to export the full list of pull requests associated
-                       to a milestone for a specified GitHub repository as a
-                       JSON file.""")
+        description="""Tool to generate a full release note based on all the 
+                       GitHub pull requests associated to a milestone from a
+                       repository. The release note will be output as a 
+                       markdown file, containing only the list of pull requests
+                       that were effectively merged (and not only closed). The 
+                       list of pull requests' authors can be generated as well
+                       in a separate file.""")
     arg_parser.add_argument(
         "-o", "--owner",
         required=True,
@@ -126,6 +130,7 @@ def main():
         milestone_param = "milestone:\"{}\"".format(args.milestone)
     sorting_param = "sort:{}".format(args.sort)
 
+    # Name of the JSON file containing the data from GitHub
     json_file = "githublist.json"
 
     github_export_pull_requests.execute(
