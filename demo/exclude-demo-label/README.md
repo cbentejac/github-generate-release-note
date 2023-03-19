@@ -11,6 +11,6 @@ All the pull requests tagged with the label "demo" are not part of the final rel
 _Any file in this directory beside this README.md is a result of the command below._
 
 ```
-./github-generate-release-note.py -o cbentejac -r github-generate-release-note -m "Demo Milestone" --pr-nb --label-include demo
+./github-generate-release-note.py -o cbentejac -r github-generate-release-note -m "Demo Milestone" --pr-nb --label-exclude demo
 ```
 
