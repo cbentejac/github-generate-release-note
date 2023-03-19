@@ -1,0 +1,10 @@
+# Demo
+
+Release note generated with a list of contributors on the side. The pull request number is directly shown, and it is not necessary to hover over the link or to click it to see which pull request is referred to.
+
+_Any file in this directory beside this README.md is a result of the command below._
+
+```
+./github-generate-release-note.py -o cbentejac -r github-generate-release-note -m "Demo Milestone" --authors --pr-nb
+```
+

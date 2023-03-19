@@ -2,6 +2,8 @@
 
 ## Demo Milestone
 
+- Corrected usage of github-generate-release-note [PR](https://github.com/cbentejac/github-generate-release-note/pull/19)
+- Add demo with basic parameters and list of authors [PR](https://github.com/cbentejac/github-generate-release-note/pull/18)
 - [FIX] Fix ambiguity between boolean and method name [PR](https://github.com/cbentejac/github-generate-release-note/pull/17)
 - Add a demo with default parameters [PR](https://github.com/cbentejac/github-generate-release-note/pull/16)
 - [FIX] Write authors file if the option is specified [PR](https://github.com/cbentejac/github-generate-release-note/pull/15)
