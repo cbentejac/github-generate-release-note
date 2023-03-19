@@ -2,6 +2,7 @@
 
 ## Demo Milestone
 
+- [FIX] Fix command shown in the "exclude-demo-label" demo [PR #23](https://github.com/cbentejac/github-generate-release-note/pull/23)
 - [FIX] Fix display of the contributors file [PR #13](https://github.com/cbentejac/github-generate-release-note/pull/13)
 - Highlight rejection of cancelled pull requests [PR #21](https://github.com/cbentejac/github-generate-release-note/pull/21)
 - Corrected usage of github-generate-release-note [PR #19](https://github.com/cbentejac/github-generate-release-note/pull/19)

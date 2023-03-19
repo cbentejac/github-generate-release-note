@@ -2,6 +2,7 @@
 
 ## Demo Milestone
 
+- Add demos including and excluding the "demo" GitHub label [PR](https://github.com/cbentejac/github-generate-release-note/pull/22)
 - Add a demo with default parameters [PR](https://github.com/cbentejac/github-generate-release-note/pull/16)
 - [FIX] Fix display of the contributors file [PR](https://github.com/cbentejac/github-generate-release-note/pull/13)
 - Highlight rejection of cancelled pull requests [PR](https://github.com/cbentejac/github-generate-release-note/pull/21)
