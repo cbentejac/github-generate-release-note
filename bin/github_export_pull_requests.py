@@ -84,9 +84,9 @@ def request_pull_requests(repository, milestone, sorting, token):
         code = response.status_code
         if code != 200:
             if code == 404:
-                print('Error 404: page not found.')
+                print("Error 404: page not found.")
             else:
-                print(response.json().get('message'))
+                print(response.json().get("message"))
             response.raise_for_status()
 
         # Save the response & concatenate it with the previous pages (if any)
@@ -97,10 +97,10 @@ def request_pull_requests(repository, milestone, sorting, token):
             pull_requests["items"].extend(response.json()["items"])
 
         # Go to the next page (if any)
-        link = response.headers.get('Link', False)
+        link = response.headers.get("Link", False)
         if link and 'rel="next"' in link:
             page = page + 1
-            extra_parameters['page'] = page
+            extra_parameters["page"] = page
         else:
             break
 
@@ -134,5 +134,5 @@ def main():
             sorting_param, args.token, args.output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

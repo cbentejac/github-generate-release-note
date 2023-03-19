@@ -418,5 +418,5 @@ def main():
             args.include, args.word_exclude, args.word_include)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
