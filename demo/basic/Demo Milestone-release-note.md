@@ -2,6 +2,7 @@
 
 ## Demo Milestone
 
+- Add basic demo with PRs' number displayed [PR](https://github.com/cbentejac/github-generate-release-note/pull/20)
 - Corrected usage of github-generate-release-note [PR](https://github.com/cbentejac/github-generate-release-note/pull/19)
 - Add demo with basic parameters and list of authors [PR](https://github.com/cbentejac/github-generate-release-note/pull/18)
 - [FIX] Fix ambiguity between boolean and method name [PR](https://github.com/cbentejac/github-generate-release-note/pull/17)
