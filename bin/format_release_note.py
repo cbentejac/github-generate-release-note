@@ -142,7 +142,7 @@ def write_authors(authors, milestone_title):
 
     with open("{}-authors.md".format(milestone_title), "w",
               encoding="utf8") as authors_file:
-        authors_file.write("## Contributors\n")
+        authors_file.write("## Contributors\n\n")
         for author in sorted(list(authors), key=str.casefold):
             authors_file.write("- {}\n".format(author))
 
