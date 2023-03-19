@@ -18,7 +18,7 @@ pip install requests
 ## Usage
 
 ```
-github-generate-release-note.py [-h] -o OWNER -r REPO -m MILESTONE
+./github-generate-release-note.py [-h] -o OWNER -r REPO -m MILESTONE
                                 [-s {created-desc,created-asc,comments-desc,comments-asc,updated-desc,updated-asc,relevance-desc}]
                                 [-t TOKEN] [--authors] [--pr-nb] [--label-exclude EXCLUDE [EXCLUDE ...]]
                                 [--label-include INCLUDE [INCLUDE ...]]
