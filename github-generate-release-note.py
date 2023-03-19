@@ -145,5 +145,5 @@ def main():
         os.remove(json_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
