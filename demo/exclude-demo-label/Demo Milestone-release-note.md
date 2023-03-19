@@ -2,12 +2,9 @@
 
 ## Demo Milestone
 
-- Add a demo with default parameters [PR #16](https://github.com/cbentejac/github-generate-release-note/pull/16)
 - [FIX] Fix display of the contributors file [PR #13](https://github.com/cbentejac/github-generate-release-note/pull/13)
 - Highlight rejection of cancelled pull requests [PR #21](https://github.com/cbentejac/github-generate-release-note/pull/21)
-- Add basic demo with PRs' number displayed [PR #20](https://github.com/cbentejac/github-generate-release-note/pull/20)
 - Corrected usage of github-generate-release-note [PR #19](https://github.com/cbentejac/github-generate-release-note/pull/19)
-- Add demo with basic parameters and list of authors [PR #18](https://github.com/cbentejac/github-generate-release-note/pull/18)
 - [FIX] Fix ambiguity between boolean and method name [PR #17](https://github.com/cbentejac/github-generate-release-note/pull/17)
 - [FIX] Write authors file if the option is specified [PR #15](https://github.com/cbentejac/github-generate-release-note/pull/15)
 - [FIX] Replace single quotes by double ones when possible [PR #12](https://github.com/cbentejac/github-generate-release-note/pull/12)
