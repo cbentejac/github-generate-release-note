@@ -15,7 +15,7 @@ The response to the requests is saved and exported into a JSON file, without any
 
 The request can contain sorting information (in which order the request should be answered) as well as a GitHub authentication token, which may be useful when many requests are sent to the GitHub API.
 
-Pagination is handled by the script: if the response spans over more than a single page (if the number of elements exceeds 100), the Exporter will send additional requests to retrieve the content over all the pages. As such, the Exporter sends at most $ceil(# of pull requests to retrieve / 100)$ requests to the GitHub API.
+Pagination is handled by the script: if the response spans over more than a single page (if the number of elements exceeds 100), the Exporter will send additional requests to retrieve the content over all the pages. As such, the Exporter sends at most $ceil(pullRequestsNb / 100)$ requests to the GitHub API.
 
 ### Usage
 
