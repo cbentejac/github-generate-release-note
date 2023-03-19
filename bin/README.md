@@ -28,8 +28,11 @@ Pagination is handled by the script: if the response spans over more than a sing
 ### Options description
 
 `-o OWNER, --owner OWNER`: owner of the GitHub repository to extract the information from
+
 `-r REPO, --repo REPO`: name of the GitHub repository to extract the information from
+
 `-m MILESTONE, --milestone MILESTONE`: name of the milestone to extract the information with
+
 `-s {created-desc,created-asc,comments-desc,comments-asc,updated-desc,updated-asc,relevance-desc}, --sort {created-desc,created-asc,comments-desc,comments-asc,updated-desc,updated-asc,relevance-desc}`: sort the pull requests in the requested order (default: updated-desc): 
 - newest (created-desc)
 - oldest (created-asc)
@@ -38,7 +41,9 @@ Pagination is handled by the script: if the response spans over more than a sing
 - recently updated (updated-desc)
 - least recently updated (updated-asc)
 - best match (relevance-desc)
+
 `--output OUTPUT`: filename for the output JSON file (default: githublist.json)
+
 `-t TOKEN, --token TOKEN`: GitHub authentication token (optional: might be needed to perform a lot of requests in a short amount of time)
 
 ## Release Note Formatter
@@ -64,9 +69,15 @@ If they are included, they will be separated from the main list and displayed in
 ### Options
 
 `-i INPUT, --input INPUT`: path of the file to parse and format (default: githublist.json) 
+
 `--authors`: save the list of pull requests authors in a dedicated file
+
 `--pr-nb`: include the merged pull requests' number with their link
+
 `--label-exclude EXCLUDE [EXCLUDE ...]`: labels that will be excluded from the release note and dumped in a dedicated file instead; several labels can be provided at once, either concatenated like "--label-exclude label1,label2" to dump them in the same file, or separated like "--label-exclude label1 label2" to dump them in separate files. a pull request does not need to have all the labels from a concatenated input to be excluded, one is enough. labels are case-sensitive. label exclusion takes precedence over word exclusion.
+
 `--label-include INCLUDE [INCLUDE ...]`: labels that will be included in the release note but in a subsection; several labels can be provided at once, either concatenated like "--label-include label1,label2" to place them in the same subsection, or separated like "--label-include label1 label2" to place them in different subsections. a pull request does not need to have all the labels from a concatenated input to be separated from the main release note, one is enough. labels are case-sensitive. label inclusion takes precedence over word inclusion.
+
 `--word-exclude WORD_EXCLUDE [WORD_EXCLUDE ...]`: words in the title of the pull requests that will be excluded from the release note and dumped in a dedicated file instead; several words can be provided at once, either concatenated like "--word-exclude word1,word2" to dump them in the same file, or separated like "--word-exclude word1,word2" to dump them in separate files. a pull request does not need to have all the words from a concatenated input in its title to be excluded, one is enough. words are case-insensitive. word exclusion is not prioritary over label exclusion.
+
 `--word-include WORD_INCLUDE [WORD_INCLUDE ...]`: words in the title of the pulls requests that will be included in the release note but in a subsection; several words can be provided at once, either concatenated like "--word-include word1,word2" to place them in the same subsection, or separated like "--word-include label1 label2" to place them in different subsections. a pull request does not need to have all the words from a concatenated input in its title to be separated from the main release note, one is enough. words are case-insensitive. word inclusion is not prioritary over label inclusion.
