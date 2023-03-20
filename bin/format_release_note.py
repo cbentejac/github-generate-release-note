@@ -143,8 +143,12 @@ def write_authors(authors, milestone_title):
     with open("{}-authors.md".format(milestone_title), "w",
               encoding="utf8") as authors_file:
         authors_file.write("## Contributors\n\n")
-        for author in sorted(list(authors), key=str.casefold):
-            authors_file.write("- {}\n".format(author))
+        cnt = 0
+        for author, url in sorted(list(authors), key=lambda x: x[0].casefold()):
+            if cnt > 0:
+                authors_file.write(", ")
+            authors_file.write("[{}]({})".format(author, url))
+            cnt = cnt + 1
 
 
 def write_excluded_prs_note(excluded_pull_requests,
@@ -286,7 +290,7 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
             continue
 
         # Update list of pull requests authors
-        authors.add(pr["user"]["login"])
+        authors.add((pr["user"]["login"], pr["user"]["html_url"]))
 
         # Get the labels from the pull request
         labels = get_pr_labels(pr)
