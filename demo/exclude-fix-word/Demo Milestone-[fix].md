@@ -1,5 +1,6 @@
 ### [fix]
 
+- Add demos including or excluding the word "[FIX]" [PR #24](https://github.com/cbentejac/github-generate-release-note/pull/24)
 - [FIX] Fix command shown in the "exclude-demo-label" demo [PR #23](https://github.com/cbentejac/github-generate-release-note/pull/23)
 - [FIX] Fix display of the contributors file [PR #13](https://github.com/cbentejac/github-generate-release-note/pull/13)
 - [FIX] Fix ambiguity between boolean and method name [PR #17](https://github.com/cbentejac/github-generate-release-note/pull/17)

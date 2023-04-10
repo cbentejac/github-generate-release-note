@@ -2,6 +2,8 @@
 
 ## Demo Milestone
 
+- Add demos including or excluding the word "[FIX]" [PR #24](https://github.com/cbentejac/github-generate-release-note/pull/24)
+- [FIX] Fix command shown in the "exclude-demo-label" demo [PR #23](https://github.com/cbentejac/github-generate-release-note/pull/23)
 - Add demos including and excluding the "demo" GitHub label [PR #22](https://github.com/cbentejac/github-generate-release-note/pull/22)
 - Add a demo with default parameters [PR #16](https://github.com/cbentejac/github-generate-release-note/pull/16)
 - [FIX] Fix display of the contributors file [PR #13](https://github.com/cbentejac/github-generate-release-note/pull/13)
@@ -20,3 +22,7 @@
 - Make the "bin" directory a Python module [PR #4](https://github.com/cbentejac/github-generate-release-note/pull/4)
 - Request and export all PRs of a milestone to a JSON file [PR #1](https://github.com/cbentejac/github-generate-release-note/pull/1)
 - Format a JSON file containing the list of PRs into a markdown release note [PR #2](https://github.com/cbentejac/github-generate-release-note/pull/2)
+
+### Contributors
+
+[cbentejac](https://github.com/cbentejac)
