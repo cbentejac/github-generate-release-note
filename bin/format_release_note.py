@@ -32,6 +32,15 @@ def setup_arg_parser():
         default=False,
         help="include the merged pull requests' number with their link")
     arg_parser.add_argument(
+        "--highlights",
+        nargs="+",
+        help="""labels that need to be highlighted in the release note, for
+                example because the pull request tagged with that label was a
+                major contribution; several labels can be provided at once, either
+                together as "--highlights label1,label2" or "--highlights label 1
+                label2". all labels provided with this option will be added to a
+                specific section, with no way to distinguish them from each other.""")
+    arg_parser.add_argument(
         "--label-exclude",
         dest="exclude",
         nargs="+",
@@ -126,6 +135,22 @@ def setup_words_of_interest(words_of_interest):
     return relevant_words
 
 
+def setup_highlighted_labels(highlighted_labels):
+    """ Parse the provided labels to add to the highlighted section. """
+    labels = []
+
+    if highlighted_labels:
+        for label in highlighted_labels:
+            if "," in label:
+                concatenated_labels = label.split(",")
+                for l in concatenated_labels:
+                    labels.append(l)
+            else:
+                labels.append(label)
+
+    return labels
+
+
 def get_pr_labels(data):
     """ Get the list of the pull request's labels (if any). """
 
@@ -144,7 +169,8 @@ def write_authors(authors, milestone_title):
               encoding="utf8") as authors_file:
         authors_file.write("## Contributors\n\n")
         cnt = 0
-        for author, url in sorted(list(authors), key=lambda x: x[0].casefold()):
+        for author, url in sorted(list(authors), key=lambda x:
+                                  x[0].casefold()):
             if cnt > 0:
                 authors_file.write(", ")
             authors_file.write("[{}]({})".format(author, url))
@@ -184,7 +210,7 @@ def write_excluded_prs_note(excluded_pull_requests,
 
 
 def write_final_release_note(pull_requests, milestone_title,
-                             included_pull_requests,
+                             highlighted_pull_requests, included_pull_requests,
                              included_word_pull_requests, show_pr_nb,
                              authors):
     """ Write the final release note containing all the pull requests that were
@@ -195,6 +221,14 @@ def write_final_release_note(pull_requests, milestone_title,
               "w", encoding="utf8") as release_note:
         release_note.write("# Release note\n\n")
         release_note.write("## {}\n\n".format(milestone_title))
+        if len(highlighted_pull_requests) > 0:
+            release_note.write("### Main features\n\n")
+            for (title, link, number) in highlighted_pull_requests:
+                release_note.write("- {} [PR{}]({})\n"
+                                   .format(title,
+                                           " " + number if show_pr_nb else "",
+                                           link))
+            release_note.write("\n### Other improvements\n\n")
         for (title, link, number) in pull_requests:
             release_note.write("- {} [PR{}]({})\n"
                                .format(title,
@@ -217,15 +251,16 @@ def write_final_release_note(pull_requests, milestone_title,
 
         release_note.write("\n### Contributors\n\n")
         cnt = 0
-        for author, url in sorted(list(authors), key=lambda x: x[0].casefold()):
+        for author, url in sorted(list(authors), key=lambda x:
+                                  x[0].casefold()):
             if cnt > 0:
                 release_note.write(", ")
             release_note.write("[{}]({})".format(author, url))
             cnt = cnt + 1
 
 
-def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
-            excl_words, incl_words):
+def execute(input_file, export_authors, show_pr_nb, highlights, excl_labels,
+            incl_labels, excl_words, incl_words):
     with open("{}".format(input_file), "r") as json_file:
         data = json.load(json_file)
 
@@ -284,6 +319,11 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
         included_word_pull_requests[word] = []
         included_word_counters[word] = 0
 
+    # Initialize the dictionary of label-highlighted pull requests
+    highlighted_labels = setup_highlighted_labels(highlights)
+    highlighted_pull_requests = []
+    highlighted_counter = 0
+
     # Counters to print a summary at the end of the script
     total_counter = 0  # Pull requests in the input file
     regular_counter = 0  # Pull requests added to the final release note
@@ -303,6 +343,17 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
 
         # Get the labels from the pull request
         labels = get_pr_labels(pr)
+
+        highlighted_pr = False
+        for label in labels:
+            if label in highlighted_labels:
+                highlighted_pull_requests.append(
+                    (pr["title"], pr["html_url"],
+                     "#{}".format(pr["number"])))
+                highlighted_counter = highlighted_counter + 1
+                regular_counter = regular_counter + 1
+                highlighted_pr = True
+                break
 
         # TODO: use a function here instead of duplicating code
         exclude_pr = False
@@ -330,7 +381,7 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
                     include_pr = True
                     break
 
-        if exclude_pr or include_pr:
+        if highlighted_pr or exclude_pr or include_pr:
             continue
 
         # Reset exclusion / inclusion booleans to check for words
@@ -395,8 +446,10 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
     print("Total number of pull requests parsed: {}".format(total_counter))
     print("Total number of pull requests added to the release note: {}"
           .format(regular_counter))
-    if included_counters:
+    if included_counters or highlighted_counter:
         print("\tAmong which:")
+        print("\t- {} highlighted pull requests with the label(s) '{}'".format(
+            highlighted_counter, " ".join(str(l) for l in highlighted_labels)))
         for label, counter in included_counters.items():
             print("\t- {} pull requests with the label(s) '{}'"
                   .format(counter, label))
@@ -415,7 +468,7 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
     if export_authors:
         write_authors(authors, milestone_title)
     write_final_release_note(pull_requests, milestone_title,
-                             included_pull_requests,
+                             highlighted_pull_requests, included_pull_requests,
                              included_word_pull_requests, show_pr_nb,
                              authors)
     if excl_labels or excl_words:
