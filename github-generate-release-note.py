@@ -57,6 +57,15 @@ def setup_arg_parser():
         default=False,
         help="include the merged pull requests' number with their link")
     arg_parser.add_argument(
+        "--highlights",
+        nargs="+",
+        help="""labels that need to be highlighted in the release note, for
+                example because the pull request tagged with that label was a
+                major contribution; several labels can be provided at once, either
+                together as "--highlights label1,label2" or "--highlights label 1
+                label2". all labels provided with this option will be added to a
+                specific section, with no way to distinguish them from each other.""")
+    arg_parser.add_argument(
         "--label-exclude",
         dest="exclude",
         nargs="+",
@@ -137,9 +146,9 @@ def main():
         repo_param, milestone_param, sorting_param, args.token, json_file)
 
     format_release_note.execute(json_file, args.authors, args.pr_nb,
-                                args.exclude, args.include, args.word_exclude,
-                                args.word_include)
-    
+                                args.highlights, args.exclude, args.include,
+                                args.word_exclude, args.word_include)
+
     # Remove the JSON file containing the response from GitHub
     if not args.save:
         os.remove(json_file)
