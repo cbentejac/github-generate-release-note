@@ -70,7 +70,7 @@ If they are included, they will be separated from the main list and displayed in
 
 `-i INPUT, --input INPUT`: path of the file to parse and format (default: githublist.json) 
 
-`--authors`: save the list of pull requests authors in a dedicated file
+`--authors`: save the list of pull requests authors in a dedicated file, instead of only having them in the release note
 
 `--pr-nb`: include the merged pull requests' number with their link
 

@@ -1,3 +1,3 @@
 ## Contributors
 
-- cbentejac
+[cbentejac](https://github.com/cbentejac)

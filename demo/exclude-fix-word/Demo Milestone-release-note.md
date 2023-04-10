@@ -15,3 +15,7 @@
 - Make the "bin" directory a Python module [PR #4](https://github.com/cbentejac/github-generate-release-note/pull/4)
 - Request and export all PRs of a milestone to a JSON file [PR #1](https://github.com/cbentejac/github-generate-release-note/pull/1)
 - Format a JSON file containing the list of PRs into a markdown release note [PR #2](https://github.com/cbentejac/github-generate-release-note/pull/2)
+
+### Contributors
+
+[cbentejac](https://github.com/cbentejac)

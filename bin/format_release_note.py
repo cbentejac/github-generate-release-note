@@ -143,8 +143,12 @@ def write_authors(authors, milestone_title):
     with open("{}-authors.md".format(milestone_title), "w",
               encoding="utf8") as authors_file:
         authors_file.write("## Contributors\n\n")
-        for author in sorted(list(authors), key=str.casefold):
-            authors_file.write("- {}\n".format(author))
+        cnt = 0
+        for author, url in sorted(list(authors), key=lambda x: x[0].casefold()):
+            if cnt > 0:
+                authors_file.write(", ")
+            authors_file.write("[{}]({})".format(author, url))
+            cnt = cnt + 1
 
 
 def write_excluded_prs_note(excluded_pull_requests,
@@ -181,7 +185,8 @@ def write_excluded_prs_note(excluded_pull_requests,
 
 def write_final_release_note(pull_requests, milestone_title,
                              included_pull_requests,
-                             included_word_pull_requests, show_pr_nb):
+                             included_word_pull_requests, show_pr_nb,
+                             authors):
     """ Write the final release note containing all the pull requests that were
         correctly merged and not excluded because of their labels. Labels that
         are included will be written in a different subsection. """
@@ -209,6 +214,14 @@ def write_final_release_note(pull_requests, milestone_title,
                                    .format(title,
                                            " " + number if show_pr_nb else "",
                                            link))
+
+        release_note.write("\n### Contributors\n\n")
+        cnt = 0
+        for author, url in sorted(list(authors), key=lambda x: x[0].casefold()):
+            if cnt > 0:
+                release_note.write(", ")
+            release_note.write("[{}]({})".format(author, url))
+            cnt = cnt + 1
 
 
 def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
@@ -286,7 +299,7 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
             continue
 
         # Update list of pull requests authors
-        authors.add(pr["user"]["login"])
+        authors.add((pr["user"]["login"], pr["user"]["html_url"]))
 
         # Get the labels from the pull request
         labels = get_pr_labels(pr)
@@ -403,7 +416,8 @@ def execute(input_file, export_authors, show_pr_nb, excl_labels, incl_labels,
         write_authors(authors, milestone_title)
     write_final_release_note(pull_requests, milestone_title,
                              included_pull_requests,
-                             included_word_pull_requests, show_pr_nb)
+                             included_word_pull_requests, show_pr_nb,
+                             authors)
     if excl_labels or excl_words:
         write_excluded_prs_note(excluded_pull_requests,
                                 excluded_word_pull_requests,

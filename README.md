@@ -45,7 +45,7 @@ pip install requests
 
 `-t TOKEN, --token TOKEN`: GitHub authentication token (optional: might be needed to perform a lot of requests in a short amount of time)
 
-`--authors`: save the list of pull requests authors in a dedicated file
+`--authors`: save the list of pull requests authors in a dedicated file, instead of only having them in the release note
 
 `--pr-nb`: include the merged pull requests' number with their link
 
