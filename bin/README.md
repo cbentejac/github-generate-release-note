@@ -61,7 +61,8 @@ If they are included, they will be separated from the main list and displayed in
 ### Usage
 
 ```
-./format_release_note.py [-h] [-i INPUT] [--authors] [--pr-nb] [--label-exclude EXCLUDE [EXCLUDE ...]]
+./format_release_note.py [-h] [-i INPUT] [--authors] [--pr-nb] [--highlights LABEL [LABEL ...]]
+                         [--label-exclude EXCLUDE [EXCLUDE ...]]
                          [--label-include INCLUDE [INCLUDE ...]] [--word-exclude WORD_EXCLUDE [WORD_EXCLUDE ...]]
                          [--word-include WORD_INCLUDE [WORD_INCLUDE ...]]
 ```
@@ -73,6 +74,8 @@ If they are included, they will be separated from the main list and displayed in
 `--authors`: save the list of pull requests authors in a dedicated file, instead of only having them in the release note
 
 `--pr-nb`: include the merged pull requests' number with their link
+
+`--highlights`: labels that need to be highlighted in the release note, for example because the pull request tagged with that label was a major contribution; several labels can be provided at once, either together as "--highlights label1,label2" or "--highlights label1 label2". all labels provided with this option will be added to a specific section, with no way to distinguish them from each other.
 
 `--label-exclude EXCLUDE [EXCLUDE ...]`: labels that will be excluded from the release note and dumped in a dedicated file instead; several labels can be provided at once, either concatenated like "--label-exclude label1,label2" to dump them in the same file, or separated like "--label-exclude label1 label2" to dump them in separate files. a pull request does not need to have all the labels from a concatenated input to be excluded, one is enough. labels are case-sensitive. label exclusion takes precedence over word exclusion.
 
